@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vitrine de Recomendações</title>
+  <style>
+    body {
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      border: 16px solid #333;
+      border-radius: 36px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      background-color: #fff;
+      overflow-y: scroll;
+    }
+
+    header {
+      background-color: #3d61ab;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top-left-radius: 20px;
+    }
+
+    header img {
+      width: 120px;
+    }
+
+    #productDetails {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    #productDetails img {
+      width: 180px;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    #productDetails h1 {
+      font-size: 18px;
+      margin: 0;
+      color: #333;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 16px 0 8px;
+      padding-left: 16px;
+      color: #333;
+    }
+
+    .compre-junto, .carousel {
+      padding: 0 16px;
+      margin-bottom: 32px;
+    }
+
+    .compre-junto-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      background-color: #fafafa;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .compre-junto-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .compre-junto-item label {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .buy-button {
+      display: block;
+      width: calc(100% - 32px);
+      margin: 0 auto 24px;
+      padding: 14px;
+      font-size: 16px;
+      background-color: #007aff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .carousel-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 16px;
+      padding-bottom: 8px;
+    }
+
+    .carousel-item {
+      scroll-snap-align: start;
+      flex: 0 0 calc(50% - 8px);
+      background: #fafafa;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .carousel-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .carousel-item p {
+        font-size: 13px;
+        margin: 6px 0 0;
+    }
+    #price{
+        font-size: 24px;
+        color: #007aff;
+        margin: 16px 0;
+    }
+    .app-footer {
+        background-color: #1f1f2e;
+        color: #fff;
+        font-size: 12px;
+        text-align: center;
+        padding: 16px;
+        margin-top: 32px;
+        bottom: 0px
+        }
+
+        .app-footer p {
+        margin: 4px 0;
+        }
+
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <header>
+      <img src="https://banco.bradesco/beneficioscartoes/svg/logo.svg" alt="Logo Bradesco">
+    </header>
+
+    <div id="productDetails">
+      <img src="https://nextqa.vteximg.com.br/arquivos/ids/159138/image-cb1d57faaf284d6e8de93196c3c3094b.jpg" alt="Camisa Grêmio 2022">
+      <h1>Camisa Grêmio 2022</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      <p id="price">R$199,99</p>
+      <button class="buy-button" onclick="">Adicionar à sacola</button>
+    </div>
+
+    <div class="compre-junto" id="compre-junto"></div>
+    <button class="buy-button" onclick="comprarSelecionados()">Comprar Junto</button>
+
+    <div class="carousel">
+      <div class="carousel-container" id="carousel-container"></div>
+    </div>
+
+    <footer class="app-footer">
+        <p><strong>Lorem Ipsum</strong> dolor sit amet, consectetur adipiscing elit.</p>
+        <p>© 2025 Bradesco Benefícios. Todos os direitos reservados.</p>
+      </footer>
+      
+  </div>
+
+  <script>
+    const apiURL = "https://staging.richrelevance.com/rrserver/api/rrPlatform/recsForPlacements?apiKey=f932a32d838ca3a3&apiClientKey=8bb22aa7783080f3&sessionId=algtestsession766693253883&userId=algtestuser468549739740&placements=item_page.compre_junto|item_page.rr1&ipor=193.186.4.238&pref=https://www.outlook.com?campaign=blackfriday&includeStrategyData=true&excludeItemAttributes=true&categoryData=false&excludeHtml=true&productId=3075";
+
+    async function fetchRecommendations() {
+        try {
+            const response = await fetch(apiURL);
+            const result = await response.json();
+
+            if (!result.placements || !Array.isArray(result.placements)) {
+                console.error("Resposta da API não contém placements válidos");
+                return;
+            }
+
+            result.placements.forEach(placement => {
+                const recs = placement.recommendedProducts;
+                const title = placement.strategyMessage || "";
+
+                if (!Array.isArray(recs) || recs.length === 0) return;
+
+                if (placement.placement === "item_page.compre_junto") {
+                    renderCompreJunto(recs, title);
+                } else if (placement.placement === "item_page.rr1") {
+                    renderCarousel(recs, title);
+                }
+            });
+        } catch (err) {
+            console.error("Erro ao carregar recomendações:", err);
+        }
+    }
+
+    function renderCompreJunto(recs, title) {
+      const container = document.getElementById("compre-junto");
+      if (!Array.isArray(recs)) return;
+
+      if (title) {
+          const heading = document.createElement("h3");
+          heading.textContent = title;
+          container.appendChild(heading);
+      }
+
+      recs.forEach((rec, index) => {
+    const div = document.createElement("div");
+    div.className = "compre-junto-item";
+    div.innerHTML = `
+        <input type="checkbox" value="${rec.productId}" data-title="${rec.name}" />
+        <img src="https://${rec.imageURL}" alt="${rec.name}" />
+        <label>${rec.name}</label>
+    `;
+    container.appendChild(div);
+
+    // Adiciona sinal de "+" entre os itens, mas não após o último
+    if (index < recs.length - 1) {
+        const plus = document.createElement("div");
+        plus.textContent = "+";
+        plus.style.textAlign = "center";
+        plus.style.fontSize = "20px";
+        plus.style.color = "#666";
+        plus.style.margin = "8px 0";
+        container.appendChild(plus);
+    }
+});
+
+    }
+
+    function renderCarousel(recs, title) {
+      const outer = document.querySelector(".carousel");
+      const container = document.getElementById("carousel-container");
+
+      if (title) {
+          const heading = document.createElement("h3");
+          heading.textContent = title;
+          outer.insertBefore(heading, container);
+      }
+
+      recs.forEach(rec => {
+          const item = document.createElement("div");
+          item.className = "carousel-item";
+          item.innerHTML = `
+              <img src="https://${rec.imageURL}" alt="${rec.name}" />
+              <p>${rec.name}</p>
+          `;
+          container.appendChild(item);
+      });
+    }
+
+    function comprarSelecionados() {
+      const checkboxes = document.querySelectorAll("#compre-junto input[type='checkbox']:checked");
+      const selecionados = Array.from(checkboxes).map(cb => ({
+        id: cb.value,
+        nome: cb.dataset.title
+      }));
+
+      if (selecionados.length > 0) {
+        alert("Produtos adicionados à sacola:\n" + selecionados.map(p => `• ${p.nome}`).join("\n"));
+      } else {
+        alert("Selecione pelo menos um produto.");
+      }
+    }
+
+    fetchRecommendations();
+  </script>
+</body>
+</html>
